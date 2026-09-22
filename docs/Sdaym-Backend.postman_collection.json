@@ -1,0 +1,366 @@
+{
+  "info": {
+    "_postman_id": "8f263b70-c259-4b35-9bfa-88ef404ae508",
+    "name": "Sdaym Backend API",
+    "description": "All Sdaym Backend API endpoints with request examples. Login automatically saves the returned JWT into the collection variable `token`.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:8000/api",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "storeKey",
+      "value": "123e4567-e89b-12d3-a456-426614174000",
+      "type": "string"
+    },
+    {
+      "key": "sallaWebhookSignature",
+      "value": "sha256=replace-with-hmac-sha256-signature",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const response = pm.response.json();",
+                  "if (response.data && response.data.token) {",
+                  "    pm.collectionVariables.set('token', response.data.token);",
+                  "}",
+                  "if (response.data && response.data.user && response.data.user.merchant) {",
+                  "    pm.collectionVariables.set('storeKey', response.data.user.merchant.public_key);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"12345678\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/auth/login",
+            "description": "Authenticate using the merchant email and password. A successful response automatically saves data.token and the merchant public_key."
+          },
+          "response": []
+        },
+        {
+          "name": "Current User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/me",
+            "description": "Returns the authenticated user and related merchant. Requires the JWT saved by Login."
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const response = pm.response.json();",
+                  "if (response.data && response.data.token) {",
+                  "    pm.collectionVariables.set('token', response.data.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/refresh",
+            "description": "Refreshes the current JWT and automatically saves the replacement token."
+          },
+          "response": []
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"current_password\": \"12345678\",\n  \"password\": \"NewSecurePass123\",\n  \"password_confirmation\": \"NewSecurePass123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/auth/change-password",
+            "description": "Password must contain at least 10 characters, letters, uppercase, lowercase, and numbers."
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/logout",
+            "description": "Invalidates the current JWT. Run this after the other authenticated requests."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Stores",
+      "item": [
+        {
+          "name": "List Special Offers",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/stores/{{storeKey}}/offers?per_page=15",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "stores",
+                "{{storeKey}}",
+                "offers"
+              ],
+              "query": [
+                {
+                  "key": "per_page",
+                  "value": "15",
+                  "description": "Optional; integer from 1 to 50."
+                }
+              ]
+            },
+            "description": "Public endpoint. storeKey is merchants.public_key, not the internal merchant ID."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Devices",
+      "item": [
+        {
+          "name": "Register FCM Device",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"store_key\": \"{{storeKey}}\",\n  \"fcm_token\": \"example-firebase-cloud-messaging-token\",\n  \"platform\": \"android\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/devices",
+            "description": "Registers or updates an FCM token. platform may be android, ios, or web."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Salla Webhooks",
+      "item": [
+        {
+          "name": "Store Authorized",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Salla-Signature",
+                "value": "{{sallaWebhookSignature}}",
+                "description": "HMAC-SHA256 of the exact raw body using SALLA_WEBHOOK_SECRET. Not required locally when the secret is empty."
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event\": \"app.store.authorize\",\n  \"merchant\": 123456789,\n  \"created_at\": \"2026-09-22T09:00:00Z\",\n  \"data\": {\n    \"access_token\": \"salla-access-token\",\n    \"refresh_token\": \"salla-refresh-token\",\n    \"token_type\": \"bearer\",\n    \"expires\": 1790067600,\n    \"scope\": \"offline_access\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/webhooks/salla"
+          },
+          "response": []
+        },
+        {
+          "name": "Special Offer Created",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Salla-Signature",
+                "value": "{{sallaWebhookSignature}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event\": \"specialoffer.created\",\n  \"merchant\": 123456789,\n  \"created_at\": \"2026-09-22T10:00:00Z\",\n  \"data\": {\n    \"id\": 98765,\n    \"name\": \"Buy one, get one\",\n    \"message\": \"Limited-time special offer\",\n    \"expiry_date\": \"2026-10-01T23:59:59Z\",\n    \"offer_type\": \"buy_x_get_y\",\n    \"status\": \"active\",\n    \"buy\": {\"quantity\": 1, \"products\": [101]},\n    \"get\": {\"quantity\": 1, \"products\": [102]},\n    \"created_at\": \"2026-09-22T10:00:00Z\",\n    \"updated_at\": \"2026-09-22T10:00:00Z\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/webhooks/salla"
+          },
+          "response": []
+        },
+        {
+          "name": "Special Offer Updated",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Salla-Signature",
+                "value": "{{sallaWebhookSignature}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event\": \"specialoffer.updated\",\n  \"merchant\": 123456789,\n  \"created_at\": \"2026-09-22T11:00:00Z\",\n  \"data\": {\n    \"id\": 98765,\n    \"name\": \"Updated special offer\",\n    \"status\": \"inactive\",\n    \"updated_at\": \"2026-09-22T11:00:00Z\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/webhooks/salla"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

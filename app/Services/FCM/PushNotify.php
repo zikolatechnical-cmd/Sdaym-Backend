@@ -12,7 +12,12 @@ class PushNotify
 
     public function __construct()
     {
-        $factory = (new Factory)->withServiceAccount(storage_path('app/firebase_credentials.json'));
+        $credentials = config('services.firebase.credentials');
+        $credentials = str_starts_with($credentials, '/') || preg_match('/^[A-Za-z]:[\\\\\/]/', $credentials)
+            ? $credentials
+            : base_path($credentials);
+
+        $factory = (new Factory)->withServiceAccount($credentials);
         $this->messaging = $factory->createMessaging();
     }
 
@@ -44,5 +49,19 @@ class PushNotify
             ->withData($data);
 
         return $this->messaging->sendMulticast($message, $tokens);
+    }
+
+    public function subscribeToTopic(string $deviceToken, string $topic): array
+    {
+        return $this->messaging->subscribeToTopic($topic, $deviceToken);
+    }
+
+    public function sendToTopic(string $topic, string $title, string $body, array $data = []): string
+    {
+        $message = CloudMessage::withTarget('topic', $topic)
+            ->withNotification(Notification::create($title, $body))
+            ->withData(array_map(static fn ($value) => (string) $value, $data));
+
+        return $this->messaging->send($message);
     }
 }

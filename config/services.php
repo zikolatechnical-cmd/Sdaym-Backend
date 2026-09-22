@@ -35,4 +35,13 @@ return [
         ],
     ],
 
+    'salla' => [
+        'webhook_secret' => env('SALLA_WEBHOOK_SECRET'),
+        'user_info_url' => env('SALLA_USER_INFO_URL', 'https://accounts.salla.sa/oauth2/user/info'),
+    ],
+
+    'firebase' => [
+        'credentials' => env('FIREBASE_CREDENTIALS', storage_path('app/firebase_credentials.json')),
+    ],
+
 ];
