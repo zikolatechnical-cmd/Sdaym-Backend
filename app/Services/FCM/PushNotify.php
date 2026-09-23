@@ -56,7 +56,7 @@ class PushNotify
         return $this->messaging->subscribeToTopic($topic, $deviceToken);
     }
 
-    public function sendToTopic(string $topic, string $title, string $body, array $data = []): string
+    public function sendToTopic(string $topic, string $title, string $body, array $data = []): array|string
     {
         $message = CloudMessage::withTarget('topic', $topic)
             ->withNotification(Notification::create($title, $body))
