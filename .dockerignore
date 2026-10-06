@@ -1,0 +1,12 @@
+.git
+.env
+.env.*
+!.env.example
+vendor
+node_modules
+public/build
+public/hot
+database/*.sqlite*
+storage/app/firebase_credentials.json
+auth.json
+*.log
