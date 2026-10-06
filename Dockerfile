@@ -86,7 +86,5 @@ RUN mkdir -p \
 
 EXPOSE 3000
 
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-    CMD curl -fsS http://127.0.0.1:3000/ >/dev/null || exit 1
 
 CMD ["sh", "-c", "if [ -z \"$APP_KEY\" ]; then echo >&2 'APP_KEY is required; generate a persistent key with: php artisan key:generate --show'; exit 1; fi; php artisan migrate --force && exec apache2-foreground"]
