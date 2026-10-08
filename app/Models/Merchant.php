@@ -13,12 +13,29 @@ class Merchant extends Model
     use HasFactory, HasUuids;
 
     protected $fillable = [
-        'public_key', 'salla_id', 'name', 'username', 'email', 'mobile', 'avatar',
-        'domain', 'plan', 'commercial_number', 'tax_number', 'access_token',
-        'refresh_token', 'token_type', 'scopes', 'token_expires_at', 'installed_at',
+        'public_key',
+        'salla_id',
+        'name',
+        'username',
+        'email',
+        'mobile',
+        'avatar',
+        'domain',
+        'plan',
+        'commercial_number',
+        'tax_number',
+        'access_token',
+        'refresh_token',
+        'token_type',
+        'scopes',
+        'token_expires_at',
+        'installed_at',
     ];
 
-    protected $hidden = ['access_token', 'refresh_token'];
+    protected $hidden = [
+        'access_token',
+        'refresh_token'
+    ];
 
     protected function casts(): array
     {
