@@ -36,7 +36,10 @@ return [
     ],
 
     'salla' => [
+        'client_id' => env('ClIENT_ID', env('ClIENT_ID')),
+        'client_secret' => env('ClIENT_SECRET_KEY', env('ClIENT_SECRET_KEY')),
         'webhook_secret' => env('SALLA_WEBHOOK_SECRET'),
+        'token_url' => env('SALLA_TOKEN_URL', 'https://accounts.salla.sa/oauth2/token'),
         'user_info_url' => env('SALLA_USER_INFO_URL', 'https://accounts.salla.sa/oauth2/user/info'),
     ],
 
