@@ -87,4 +87,4 @@ RUN mkdir -p \
 EXPOSE 3000
 
 
-CMD ["sh", "-c", "if [ -z \"$APP_KEY\" ]; then echo >&2 'APP_KEY is required; generate a persistent key with: php artisan key:generate --show'; exit 1; fi; php artisan migrate --force && exec apache2-foreground"]
+CMD ["sh", "-c", "if [ -z \"$APP_KEY\" ]; then echo >&2 'APP_KEY is required; generate a persistent key with: php artisan key:generate --show'; exit 1; fi; php artisan migrate --force && (php artisan schedule:work > /dev/null 2>&1 &) && exec apache2-foreground"]
