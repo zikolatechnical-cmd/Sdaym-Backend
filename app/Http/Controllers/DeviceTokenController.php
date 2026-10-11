@@ -14,7 +14,7 @@ class DeviceTokenController extends Controller
     {
         $validated = $request->validated();
 
-        $merchant = Merchant::where('public_key', $validated['store_key'])->firstOrFail();
+        $merchant = Merchant::first();
         $hash = hash('sha256', $validated['fcm_token']);
 
         $device = DeviceToken::updateOrCreate(
