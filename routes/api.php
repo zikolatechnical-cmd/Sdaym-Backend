@@ -4,7 +4,9 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DeviceTokenController;
 use App\Http\Controllers\SpecialOfferController;
 use App\Http\Controllers\WebHookController;
+use App\Services\FCM\PushNotify;
 use Illuminate\Support\Facades\Route;
+
 
 Route::post('/webhooks/salla', [WebHookController::class, 'sallaHandle'])
     ->name('webhooks.salla');
@@ -24,4 +26,10 @@ Route::prefix('auth')->group(function (): void {
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::post('/change-password', [AuthController::class, 'changePassword']);
     });
+});
+
+Route::post('/test-notification', function () {
+   $fcm = new PushNotify();
+   $fcm->sendPushNotification(request('token'), request('title'), request('message'));
+    return 'Notification sent';
 });
