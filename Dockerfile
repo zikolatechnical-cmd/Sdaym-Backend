@@ -72,7 +72,7 @@ WORKDIR /var/www/html
 
 COPY --from=vendor --chown=www-data:www-data /app ./
 COPY --from=frontend --chown=www-data:www-data /app/public/build ./public/build
-
+RUN php artisan storage:link
 RUN mkdir -p \
         storage/framework/cache/data \
         storage/framework/sessions \
