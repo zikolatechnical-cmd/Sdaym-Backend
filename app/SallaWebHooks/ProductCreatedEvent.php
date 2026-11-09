@@ -13,7 +13,7 @@ class ProductCreatedEvent extends EventHandlerManager
             request()->integer('merchant'), request()->input('data', []), request()->input('created_at'),
         );
 
-        if ($product->status === 'sale' && $product->show_in_app && ! $product->notification_sent_at) {
+        if (! $product->notification_sent_at) {
             app(PushNotify::class)->sendToTopic(
                 $product->merchant->notificationTopic(),
                 'منتج جديد: '.$product->name,
