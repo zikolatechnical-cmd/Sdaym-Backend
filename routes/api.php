@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\DeviceTokenController;
 use App\Http\Controllers\SpecialOfferController;
 use App\Http\Controllers\WebHookController;
@@ -16,6 +17,9 @@ Route::post('/devices', [DeviceTokenController::class, 'store'])
 
 Route::get('/stores/{merchant:public_key}/offers', [SpecialOfferController::class, 'index'])
     ->name('offers.index');
+
+Route::get('/stores/{merchant:public_key}/products', [ProductController::class, 'index'])
+    ->name('products.index');
 
 Route::prefix('auth')->group(function (): void {
     Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');

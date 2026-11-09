@@ -58,6 +58,11 @@ class Merchant extends Model
         return $this->hasMany(DeviceToken::class);
     }
 
+    public function products(): HasMany
+    {
+        return $this->hasMany(Product::class);
+    }
+
     public function user(): HasOne
     {
         return $this->hasOne(User::class);
