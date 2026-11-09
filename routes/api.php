@@ -2,11 +2,11 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DeviceTokenController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\SpecialOfferController;
 use App\Http\Controllers\WebHookController;
 use App\Services\FCM\PushNotify;
 use Illuminate\Support\Facades\Route;
-
 
 Route::post('/webhooks/salla', [WebHookController::class, 'sallaHandle'])
     ->name('webhooks.salla');
@@ -16,6 +16,10 @@ Route::post('/devices', [DeviceTokenController::class, 'store'])
 
 Route::get('/stores/{merchant:public_key}/offers', [SpecialOfferController::class, 'index'])
     ->name('offers.index');
+
+Route::get('/stores/{merchant:public_key}/orders', [OrderController::class, 'index'])
+    ->middleware('auth:api')
+    ->name('orders.index');
 
 Route::prefix('auth')->group(function (): void {
     Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
@@ -29,7 +33,8 @@ Route::prefix('auth')->group(function (): void {
 });
 
 Route::post('/test-notification', function () {
-   $fcm = new PushNotify();
-   $fcm->sendPushNotification(request('token'), request('title'), request('message'));
+    $fcm = new PushNotify;
+    $fcm->sendPushNotification(request('token'), request('title'), request('message'));
+
     return 'Notification sent';
 });

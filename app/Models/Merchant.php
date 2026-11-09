@@ -34,7 +34,7 @@ class Merchant extends Model
 
     protected $hidden = [
         'access_token',
-        'refresh_token'
+        'refresh_token',
     ];
 
     protected function casts(): array
@@ -56,6 +56,11 @@ class Merchant extends Model
     public function deviceTokens(): HasMany
     {
         return $this->hasMany(DeviceToken::class);
+    }
+
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class);
     }
 
     public function user(): HasOne
