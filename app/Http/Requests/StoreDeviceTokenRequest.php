@@ -15,7 +15,9 @@ class StoreDeviceTokenRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'store_key' => ['required', 'uuid', 'exists:merchants,public_key'],
             'fcm_token' => ['required', 'string', 'max:4096'],
+            'customer_id' => ['nullable', 'integer', 'min:1'],
             'platform' => ['nullable', Rule::in(['android', 'ios', 'web'])],
         ];
     }

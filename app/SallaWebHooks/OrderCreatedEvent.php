@@ -2,7 +2,7 @@
 
 namespace App\SallaWebHooks;
 
-use App\Services\FCM\PushNotify;
+use App\Services\FCM\OrderNotificationService;
 use App\Services\Salla\OrderSyncService;
 
 class OrderCreatedEvent extends EventHandlerManager
@@ -14,18 +14,15 @@ class OrderCreatedEvent extends EventHandlerManager
         );
 
         if (! $order->notification_sent_at) {
-            app(PushNotify::class)->sendToTopic(
-                $order->merchant->notificationTopic(),
+            $sent = app(OrderNotificationService::class)->send(
+                $order,
                 'طلب جديد',
                 'تم إنشاء طلب جديد في المتجر',
-                [
-                    'type' => 'order',
-                    'order_id' => $order->salla_id,
-                    'store_key' => $order->merchant->public_key,
-                    'event' => $this->event,
-                ],
+                $this->event,
             );
-            $order->update(['notification_sent_at' => now()]);
+            if ($sent) {
+                $order->update(['notification_sent_at' => now()]);
+            }
         }
 
         return response()->json(['received' => true]);

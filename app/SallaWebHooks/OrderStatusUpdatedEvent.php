@@ -2,9 +2,8 @@
 
 namespace App\SallaWebHooks;
 
-use App\Services\FCM\PushNotify;
+use App\Services\FCM\OrderNotificationService;
 use App\Services\Salla\OrderSyncService;
-use Illuminate\Support\Facades\Log;
 
 class OrderStatusUpdatedEvent extends EventHandlerManager
 {
@@ -14,16 +13,11 @@ class OrderStatusUpdatedEvent extends EventHandlerManager
             request()->integer('merchant'), request()->input('data', []), true,
         );
 
-        app(PushNotify::class)->sendToTopic(
-            $order->merchant->notificationTopic(),
+        app(OrderNotificationService::class)->send(
+            $order,
             'تحديث الطلب',
             'تم تحديث حالة طلب في المتجر',
-            [
-                'type' => 'order',
-                'order_id' => $order->salla_id,
-                'store_key' => $order->merchant->public_key,
-                'event' => $this->event,
-            ],
+            $this->event,
         );
 
         return response()->json(['received' => true]);

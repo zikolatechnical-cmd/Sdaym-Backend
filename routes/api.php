@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DeviceTokenController;
+use App\Http\Controllers\MerchantController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\SpecialOfferController;
 use App\Http\Controllers\WebHookController;
@@ -13,6 +14,9 @@ Route::post('/webhooks/salla', [WebHookController::class, 'sallaHandle'])
 
 Route::post('/devices', [DeviceTokenController::class, 'store'])
     ->name('devices.store');
+
+Route::get('/merchants', [MerchantController::class, 'index'])
+    ->name('merchants.index');
 
 Route::get('/stores/{merchant:public_key}/offers', [SpecialOfferController::class, 'index'])
     ->name('offers.index');

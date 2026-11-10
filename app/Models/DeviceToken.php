@@ -10,13 +10,16 @@ class DeviceToken extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['merchant_id', 'token_hash', 'token', 'platform', 'last_seen_at'];
+    protected $fillable = ['merchant_id', 'customer_id', 'token_hash', 'token', 'platform', 'last_seen_at'];
 
     protected $hidden = ['token', 'token_hash'];
 
     protected function casts(): array
     {
-        return ['token' => 'encrypted', 'last_seen_at' => 'datetime'];
+        return [
+            'token' => 'encrypted', 'last_seen_at' => 'datetime',
+            'customer_id' => 'integer',
+        ];
     }
 
     public function merchant(): BelongsTo
