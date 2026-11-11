@@ -4,6 +4,7 @@ namespace App\Services\FCM;
 
 use App\Models\DeviceToken;
 use App\Models\Order;
+use Illuminate\Support\Facades\Log;
 use RuntimeException;
 
 class OrderNotificationService
@@ -31,11 +32,34 @@ class OrderNotificationService
                     ],
                 );
 
-                if ($report->hasFailures()) {
-                    throw new RuntimeException('Some order notifications could not be delivered.');
+                $retryableFailure = null;
+                foreach ($report->failures()->getItems() as $failure) {
+                    $device = $devices->first(fn ($device) => $device->token === $failure->target()->value());
+                    $invalidToken = $failure->messageTargetWasInvalid() || $failure->messageWasSentToUnknownToken();
+
+                    Log::warning('Order notification delivery failed.', [
+                        'order_id' => $order->salla_id,
+                        'merchant_id' => $order->merchant_id,
+                        'device_id' => $device?->id,
+                        'event' => $event,
+                        'error_type' => get_class($failure->error()),
+                        // Firebase errors can contain the registration token.
+                        'error' => str_replace($devices->pluck('token')->all(), '[redacted]', $failure->error()->getMessage()),
+                        'invalid_token' => $invalidToken,
+                    ]);
+
+                    if ($invalidToken) {
+                        $device?->delete();
+                    } else {
+                        $retryableFailure ??= $failure->error();
+                    }
                 }
 
-                $sent = true;
+                if ($retryableFailure !== null) {
+                    throw new RuntimeException('Order notification delivery failed; see the delivery log for details.', 0, $retryableFailure);
+                }
+
+                $sent = $sent || $report->successes()->count() > 0;
             });
 
         return $sent;
