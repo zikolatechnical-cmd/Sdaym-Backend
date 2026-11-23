@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\DeviceTokenController;
 use App\Http\Controllers\MerchantController;
 use App\Http\Controllers\OrderController;
@@ -24,6 +25,8 @@ Route::get('/stores/{merchant:public_key}/offers', [SpecialOfferController::clas
 Route::get('/stores/{merchant:public_key}/orders', [OrderController::class, 'index'])
     ->middleware('auth:api')
     ->name('orders.index');
+Route::get('/stores/{merchant:public_key}/products', [ProductController::class, 'index'])
+    ->name('products.index');
 
 Route::prefix('auth')->group(function (): void {
     Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');

@@ -61,6 +61,9 @@ class Merchant extends Model
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class);
+    public function products(): HasMany
+    {
+        return $this->hasMany(Product::class);
     }
 
     public function user(): HasOne
